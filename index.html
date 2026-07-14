@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Tra Cứu Mã Linh Kiện Tương Đương</title>
+    <style>
+        /* --- 1. PHONG CÁCH NỀN VÀ GIAO DIỆN TỔNG THỂ (DARK MODE) --- */
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- 2. KHUNG CHỨA TỰ ĐỘNG KHỚP KÍCH THƯỚC --- */
+        main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 24px;
+            padding: 35px;
+            width: 100%;
+            max-width: 1200px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            transition: border-color 0.3s;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        /* --- 3. TIÊU ĐỀ VÀ ICON --- */
+        .icon-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #94a3b8;
+            margin: 0 0 30px 0;
+            line-height: 1.5;
+        }
+
+        /* --- 4. KHU VỰC TRƯNG BÀY HÌNH ẢNH SẢN PHẨM --- */
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        @media (min-width: 768px) {
+            .showcase-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .showcase-item {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .showcase-item:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.15);
+        }
+
+        .showcase-img-wrap {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .showcase-img-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .showcase-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .showcase-desc { font-size: 11px; color: #64748b; margin-top: 4px; }
+        
+        .brand-tags {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 10px;
+            font-style: italic;
+            border-top: 1px solid #1e293b;
+            padding-top: 8px;
+            width: 100%;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .showcase-item.highlight-orange { border-color: rgba(245, 158, 11, 0.4); }
+        .showcase-item.highlight-orange:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.2);
+        }
+
+        /* --- 5. KHU VỰC FORM TIẾP NHẬN YÊU CẦU BẢN VẼ --- */
+        .ballscrew-special-section {
+            text-align: left;
+            background: linear-gradient(to bottom right, rgba(245, 158, 11, 0.03), rgba(234, 88, 12, 0.05));
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+        
+        .ballscrew-title {
+            font-size: 14px;
+            color: #f59e0b;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ballscrew-desc { font-size: 13px; color: #94a3b8; margin-bottom: 16px; }
+
+        .ballscrew-form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .ballscrew-form-grid { 
+                grid-template-columns: 2fr 1.5fr 1fr; 
+                align-items: start; 
+                gap: 20px;
+            }
+        }
+
+        .form-group { text-align: left; }
+        
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .hidden-file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .custom-file-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            height: 46px;
+            padding: 0 14px;
+            background-color: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 10px;
+            color: #94a3b8;
+            font-size: 13px;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        .custom-file-button:hover {
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .file-list-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .file-name {
+            color: #e2e8f0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 80%;
+        }
+
+        .btn-remove-file {
+            background: none;
+            border: none;
+            color: #f87171;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 0 4px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .btn-remove-file:hover { color: #ef4444; }
+
+        button.btn-submit-ballscrew {
+            width: 100%;
+            height: 46px;
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.2);
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        button.btn-submit-ballscrew:hover {
+            background: linear-gradient(135deg, #d97706, #c2410c);
+        }
+
+        /* --- 6. KHU VỰC TRA CỨU CHUYỂN ĐỔI MÃ CHUNG --- */
+        .search-flex-group {
+            text-align: left;
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .search-section-title {
+            font-size: 13px;
+            color: #3b82f6;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        @media (min-width: 768px) {
+            .search-inner-layout { display: flex; gap: 15px; align-items: flex-end; }
+            .search-inner-layout .form-group { flex-grow: 1; }
+            button.btn-search { width: 220px !important; margin-top: 0 !important; }
+        }
+
+        input[id="seriesSearchInput"] {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 14px;
+            color: white;
+            font-size: 16px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-sizing: border-box;
+        }
+
+        button.btn-search {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #3b82f6, #6366f1);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-top: 12px;
+            box-sizing: border-box;
+        }
+        /* --- 7. KHU VỰC YÊU CẦU BÁO GIÁ MÃ BẤT KỲ --- */
+.any-quote-section {
+    text-align: left;
+    background: linear-gradient(to bottom right, rgba(16, 185, 129, 0.03), rgba(5, 150, 105, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 24px;
+    border-radius: 16px;
+    margin-bottom: 25px;
+}
+
+.any-quote-title {
+    font-size: 14px;
+    color: #10b981;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-submit-any {
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.btn-submit-any:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+        /* Kết quả động */
+        .result-container {
+            margin-top: 24px;
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            margin-bottom: 25px;
+        }
+        .result-container.show { opacity: 1; transform: translateY(0); }
+        .result-box { padding: 20px; border-radius: 16px; font-size: 14px; text-align: left; background-color: #0f172a; border: 1px solid #334155; }
+        .status-success { border-color: #10b981; }
+        .status-warning { border-color: #f59e0b; }
+        .status-error { border-color: #ef4444; }
+        .result-title { font-weight: 700; font-size: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+        .text-success { color: #34d399; }
+        .text-warning { color: #fbbf24; }
+        .text-error { color: #f87171; }
+
+        .final-code-box {
+            background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(99, 102, 241, 0.05));
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(59, 130, 246, 0.2); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .final-code-box { 
+                flex-direction: row; 
+                align-items: flex-end;
+                justify-content: space-between; 
+            }
+            .lead-capture-form { 
+                display: flex; 
+                gap: 12px; 
+                align-items: flex-end;
+                flex: 1; 
+            }
+            .lead-input-wrap { flex-grow: 1; }
+        }
+        
+        .code-wrap-area { display: flex; flex-direction: column; gap: 8px; }
+        .code-highlight { display: inline-block; background: linear-gradient(to right, #3b82f6, #6366f1); color: white; padding: 8px 20px; border-radius: 8px; font-family: monospace; font-weight: 900; font-size: 20px; text-align: center; }
+        .catalog-link-btn { display: inline-flex; align-items: center; justify-content: center; font-size: 12px; color: #3b82f6; text-decoration: none; font-weight: bold; background: rgba(59, 130, 246, 0.1); padding: 8px 12px; border-radius: 6px; border: 1px dashed rgba(59, 130, 246, 0.3); transition: all 0.2s; box-sizing: border-box; min-height: 36px; }
+        .catalog-link-btn:hover { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+        .input-lead { width: 100%; height: 46px; padding: 0 14px; background-color: #0f172a; border: 1px solid #475569; border-radius: 10px; color: white; box-sizing: border-box; }
+        button.btn-submit-lead { height: 46px; background: linear-gradient(to right, #10b981, #059669); color: white; border: none; padding: 0 24px; font-size: 13px; font-weight: 700; border-radius: 10px; text-transform: uppercase; cursor: pointer; white-space: nowrap; box-sizing: border-box; transition: opacity 0.2s; }
+        button.btn-submit-lead:hover { opacity: 0.9; }
+
+        .demo-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid #334155; text-align: left; }
+        .demo-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 8px; }
+        .demo-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag-btn { background-color: #0f172a; color: #94a3b8; border: 1px solid #334155; padding: 6px 12px; border-radius: 8px; font-family: monospace; font-size: 12px; cursor: pointer; }
+        
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 11px;
+            color: #475569;
+            border-top: 1px solid #1e293b;
+        }
+        .disclaimer { font-size: 10px; color: #334155; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+    <main>
+        <div class="main-card">
+            
+            <div class="icon-box">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 2.1l4 4-4 4"/><path d="M3 12.2v-2a4 4 0 0 1 4-4h14"/><path d="M7 21.9l-4-4 4-4"/><path d="M21 11.8v2a4 4 0 0 1-4 4H3"/></svg>
+            </div>
+            <h1>CROSS-REFERENCE TOOL</h1>
+            <p class="subtitle">Hệ thống tra cứu mã khí nén, cơ khí và tiếp nhận bản vẽ.</p>
+
+            <div class="showcase-grid">
+                <div class="showcase-item">
+                    <div class="showcase-img-wrap"><img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=300&auto=format&fit=crop" alt="LM Guide"></div>
+                    <div class="showcase-title">Thanh Trượt Vuông</div>
+                    <div class="showcase-desc">Băng dẫn hướng chính xác</div>
+                    <div class="brand-tags">THK, Aplus, HIWIN...</div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-img-wrap"><img src="https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=300&auto=format&fit=crop" alt="Cylinder"></div>
+                    <div class="showcase-title">Xy Lanh Khí Nén</div>
+                    <div class="showcase-desc">Dòng compact & tiêu chuẩn</div>
+                    <div class="brand-tags">SMC,Festo,Airtac...</div>
+                </div>
+                <div class="showcase-item highlight-orange">
+                    <div class="showcase-img-wrap"><img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=300&auto=format&fit=crop" alt="Ball Screw"></div>
+                    <div class="showcase-title" style="color: #f59e0b;">Ball Screw</div>
+                    <div class="showcase-desc">Vít me bi gia công đầu trục</div>
+                    <div class="brand-tags" style="color: rgba(245, 158, 11, 0.7);">TBI, NSK, THK, HIWIN...</div>
+                </div>
+                <div class="showcase-item">
+                    <div class="showcase-img-wrap"><img src="https://images.unsplash.com/photo-1540206351-d6465b3ac5c1?q=80&w=300&auto=format&fit=crop" alt="Fitting"></div>
+                    <div class="showcase-title">Đầu Nối Khí Nén</div>
+                    <div class="showcase-desc">Co nối, ống hơi chịu áp</div>
+                    <div class="brand-tags">SMC, SangA, Festo...</div>
+                </div>
+            </div>
+
+            <form id="ballscrewForm" action="https://getform.io/f/THAY_MA_GETFORM_TAY_DAY" method="POST" enctype="multipart/form-data" class="ballscrew-special-section" onsubmit="submitBallscrewForm(event)">
+                <div class="ballscrew-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                    YÊU CẦU GIA CÔNG TRỤC VÍT ME THEO BẢN VẼ
+                </div>
+                <div class="ballscrew-desc">Tải trực tiếp bản vẽ kỹ thuật (.pdf, .dwg, .png, .jpg) tại đây để nhận báo giá nhanh nhất.</div>
+                
+                <div class="ballscrew-form-grid">
+                    <div class="form-group">
+                        <label>1. SĐT / Email liên hệ:</label>
+                        <input type="text" name="Thong_Tin_Lien_He" placeholder="Nhập số điện thoại hoặc email của bạn..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>2. Đính kèm Bản vẽ kỹ thuật:</label>
+                        <div class="file-upload-wrapper">
+                            <div class="custom-file-button" id="customFileBtn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Chọn bản vẽ (Có thể chọn nhiều)
+                            </div>
+                            <input type="file" id="ballscrewFileInput" class="hidden-file-input" multiple>
+                        </div>
+                        <div class="file-list-container" id="fileListContainer"></div>
+                    </div>
+                    <div class="form-group">
+                        <label style="visibility: hidden; user-select: none;">3. GỬI BẢN VẼ</label>
+                        <button type="submit" id="btnSubmitBallscrew" class="btn-submit-ballscrew">Gửi Bản Vẽ</button>
+                    </div>
+                </div>
+                <input type="hidden" name="Loai_Yeu_Cau" value="Gia_Cong_Truc_Vit_Me_Theo_Ban_Ve">
+            </form>
+
+            <div class="search-flex-group">
+                <div class="search-section-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    Tra cứu & Chuyển đổi mã linh kiện tự động
+                </div>
+                <div class="search-inner-layout">
+                    <div class="form-group">
+                        <label for="seriesSearchInput">Mã sản phẩm hãng cần tra (SMC, THK...):</label>
+                        <input type="text" id="seriesSearchInput" placeholder="Ví dụ: MXQ12-30, HSR20, SC50X100..." onkeypress="handleKeyPress(event)" />
+                    </div>
+                    <button onclick="convertProductSeries()" class="btn-search">Bắt Đầu Quy Đổi Mã</button>
+                </div>
+            </div>
+
+            <div id="seriesResultContainer" class="result-container">
+                <div id="seriesResultContent" class="result-box"></div>
+            </div>
+
+            <div class="demo-section">
+                <div class="demo-title">Bấm để kiểm tra nhanh một số mã mẫu:</div>
+                <div class="demo-tags">
+                    <button onclick="fillDemoCode('MXQ12-50')" class="tag-btn">SMC: MXQ12-50</button>
+                    <button onclick="fillDemoCode('CQ2B25-30D')" class="tag-btn">SMC: CQ2B25-30D</button>
+                    <button onclick="fillDemoCode('HSR20A')" class="tag-btn">THK: HSR20A</button>
+                    <button onclick="fillDemoCode('SHS25')" class="tag-btn">THK: SHS25</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 Hệ Thống Đối Chiếu Mã Linh Kiện Công Nghiệp Tự Động. Bảo lưu mọi quyền.
+        <div class="disclaimer">* Toàn bộ thương hiệu SMC, Airtac, THK thuộc sở hữu của bên liên quan, được sử dụng tại đây với mục đích đối chiếu kỹ thuật.</div>
+    </footer>
+
+    <script>
+        // 1. DATABASE CHUYỂN ĐỔI MÃ CÓ PHÂN LOẠI THƯƠNG HIỆU
+        const crossReferenceDatabase = [
+            // --- HỆ THANH TRƯỢT THK CHUYỂN SANG THƯƠNG HIỆU APLUS ---
+            { competitorPrefix: "HSR", ourPrefix: "HSR_AP", brand: "Aplus", productName: "Thanh trượt vuông tiêu chuẩn tải nặng", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "SHS", ourPrefix: "SHS_AP", brand: "Aplus", productName: "Thanh trượt vuông bốn hướng tải như nhau", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "SRS", ourPrefix: "SRS_AP", brand: "Aplus", productName: "Thanh trượt vuông mini thuôn gọn", image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=150", catalog: "#" },
+
+            // --- HỆ KHÍ NÉN SMC CHUYỂN SANG THƯƠNG HIỆU AIRICH ---
+            { competitorPrefix: "CJ2B-T", ourPrefix: "RQSE", brand: "Airich", productName: "Xy lanh mini hai đầu hành trình", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "CJ2B-S", ourPrefix: "RQSE", brand: "Airich", productName: "Xy lanh mini thân inox", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "CQ2B-XC8", ourPrefix: "NDBJ", brand: "Airich", productName: "Xy lanh vuông bo góc đặc biệt", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "CQ2B-XB11", ourPrefix: "NDBL", brand: "Airich", productName: "Xy lanh vuông tiêu chuẩn hành trình dài", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+
+            { competitorPrefix: "CJ2B", ourPrefix: "RQE", brand: "Airich", productName: "Xy lanh mini thân tròn Thép không gỉ", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "CQ2B", ourPrefix: "NDB", brand: "Airich", productName: "Xy lanh mỏng (Compact Cylinder) vuông", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "MHZ2", ourPrefix: "THA", brand: "Airich", productName: "Tay kẹp khí nén dạng kẹp song song", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "MHL2", ourPrefix: "THB", brand: "Airich", productName: "Tay kẹp khí nén hành trình rộng", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            
+            { competitorPrefix: "MXQ", ourPrefix: "LRC", brand: "Airich", productName: "Xy lanh trượt tích hợp thanh dẫn hướng", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "MXS", ourPrefix: "LRB", brand: "Airich", productName: "Xy lanh trượt hướng dẫn độ chính xác cao", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            
+            { competitorPrefix: "SC", ourPrefix: "HYC", brand: "Airich", productName: "Xy lanh vuông tiêu chuẩn đế sắt", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" },
+            { competitorPrefix: "SI", ourPrefix: "HSI", brand: "Airich", productName: "Xy lanh khí nén ISO 15552 tiêu chuẩn", image: "https://images.unsplash.com/photo-1617791160536-598cf32026fb?q=80&w=150", catalog: "#" }
+        ];
+
+        // 2. LOGIC QUẢN LÝ FORM ĐÍNH KÈM NHIỀU FILE
+        let selectedFiles = [];
+        const fileInput = document.getElementById('ballscrewFileInput');
+        const fileListContainer = document.getElementById('fileListContainer');
+        const customFileBtn = document.getElementById('customFileBtn');
+
+        if(fileInput) {
+            fileInput.addEventListener('change', function() {
+                const newFiles = Array.from(fileInput.files);
+                selectedFiles = selectedFiles.concat(newFiles);
+                updateFileList();
+                fileInput.value = "";
+            });
+        }
+
+        function updateFileList() {
+            if(!fileListContainer || !customFileBtn) return;
+            fileListContainer.innerHTML = "";
+            
+            if (selectedFiles.length === 0) {
+                customFileBtn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Chọn bản vẽ (Có thể chọn nhiều)
+                `;
+                return;
+            }
+
+            customFileBtn.innerHTML = `📂 Đã chọn ${selectedFiles.length} file (Bấm để chọn thêm)`;
+
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                const fileSize = (file.size / 1024).toFixed(1);
+                const sizeText = fileSize > 1000 ? `${(fileSize / 1024).toFixed(1)} MB` : `${fileSize} KB`;
+
+                fileItem.innerHTML = `
+                    <span class="file-name">📄 ${file.name} <span style="color: #64748b; font-size:10px;">(${sizeText})</span></span>
+                    <button type="button" class="btn-remove-file" onclick="removeFile(${index})">&times;</button>
+                `;
+                fileListContainer.appendChild(fileItem);
+            });
+        }
+
+        function removeFile(indexToRemove) {
+            selectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
+            updateFileList();
+        }
+
+        function submitBallscrewForm(event) {
+            event.preventDefault();
+            const form = event.target;
+            const button = document.getElementById("btnSubmitBallscrew");
+            
+            if(form.action.includes("THAY_MA_GETFORM_TAY_DAY")) {
+                alert("Bạn vui lòng cấu hình mã Form ID từ Getform.io trước khi dùng.");
+                return;
+            }
+
+            if(selectedFiles.length === 0) {
+                alert("Vui lòng đính kèm ít nhất 1 bản vẽ kỹ thuật trước khi gửi.");
+                return;
+            }
+
+            button.disabled = true;
+            button.innerText = "Đang gửi file...";
+
+            const formData = new FormData();
+            formData.append("Thong_Tin_Lien_He", form.elements["Thong_Tin_Lien_He"].value);
+            formData.append("Loai_Yeu_Cau", form.elements["Loai_Yeu_Cau"].value);
+            
+            selectedFiles.forEach(file => {
+                formData.append("File_Ban_Ve", file);
+            });
+
+            fetch(form.action, {
+                method: "POST",
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                if (response.ok) {
+                    form.innerHTML = `
+                        <div style="text-align: center; width: 100%; padding: 20px 0; color: #f59e0b; font-weight: bold; line-height: 1.6;">
+                            🎉 Nhận bản vẽ thành công!<br><span style="font-size: 13px; color: #94a3b8; font-weight: normal;">Hệ thống đã nhận được đầy đủ file đính kèm. Kỹ thuật viên sẽ đối chiếu biên dạng và liên hệ phản hồi báo giá sớm nhất.</span>
+                        </div>
+                    `;
+                    selectedFiles = [];
+                } else {
+                    alert("Có lỗi xảy ra khi tải file. Vui lòng thử lại.");
+                    button.disabled = false; button.innerText = "Gửi Bản Vẽ";
+                }
+            }).catch(error => {
+                alert("Lỗi kết nối mạng.");
+                button.disabled = false; button.innerText = "Gửi Bản Vẽ";
+            });
+        }
+
+        // 3. LOGIC QUY ĐỔI MÃ TỰ ĐỘNG THÔNG MINH
+        function handleKeyPress(event) { if (event.key === "Enter") { convertProductSeries(); } }
+        function fillDemoCode(code) { document.getElementById("seriesSearchInput").value = code; convertProductSeries(); }
+
+        function convertProductSeries() {
+            const inputVal = document.getElementById("seriesSearchInput").value.trim().toUpperCase();
+            const container = document.getElementById("seriesResultContainer");
+            const content = document.getElementById("seriesResultContent");
+
+            container.classList.remove("show");
+            container.style.display = "none";
+
+            if (inputVal === "") {
+                content.className = "result-box status-warning";
+                content.innerHTML = `<div class="result-title text-warning">⚠️ Chú ý</div><div style="color: #fbbf24;">Vui lòng nhập mã model linh kiện để tra cứu.</div>`;
+                showContainerSmoothly(container); return;
+            }
+
+            let matchRule = null;
+            let matchedPrefix = "";
+
+            // Sắp xếp dữ liệu để ưu tiên khớp mã dài trước
+            const sortedDatabase = [...crossReferenceDatabase].sort((a, b) => b.competitorPrefix.length - a.competitorPrefix.length);
+
+            for (let rule of sortedDatabase) {
+                const prefix = rule.competitorPrefix.toUpperCase();
+                
+                if (inputVal.startsWith(prefix)) {
+                    const nextChar = inputVal.charAt(prefix.length);
+                    // Điều kiện chống nhận nhầm tiền tố chữ (ví dụ nhập THK không bị dính vào quy tắc mã khí nén đầu TH)
+                    if (nextChar === "" || nextChar === "-" || (nextChar >= "0" && nextChar <= "9")) {
+                        matchRule = rule;
+                        matchedPrefix = rule.competitorPrefix;
+                        break;
+                    }
+                }
+            }
+
+            if (matchRule) {
+                const suffix = inputVal.substring(matchedPrefix.length);
+                const finalOurCode = matchRule.ourPrefix + suffix;
+                const formspreeLink = "https://formspree.io/f/xoqvvbnd"; 
+                
+                // Lấy tên thương hiệu động từ Database (Aplus hoặc Airich)
+                const currentBrand = matchRule.brand ? matchRule.brand : "Airich";
+
+                content.className = "result-box status-success";
+                content.innerHTML = `
+                    <div class="result-title text-success">✔ Đã tìm thấy mã quy đổi thương hiệu ${currentBrand} tương đương!</div>
+                    
+                    <div style="display: flex; gap: 15px; background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 15px; align-items: center;">
+                        <div style="width: 80px; height: 80px; background: #0f172a; border-radius: 8px; padding: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <img src="${matchRule.image}" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 4px;">
+                        </div>
+                        <div style="font-family: monospace; font-size: 13px; color: #94a3b8; line-height: 1.5;">
+                            • Mã gốc nhập vào: <strong style="color: #f1f5f9;">${inputVal}</strong><br>
+                            • Loại linh kiện: <strong style="color: #f1f5f9;">${matchRule.productName}</strong>
+                        </div>
+                    </div>
+
+                    <form onsubmit="submitQuoteForm(event, '${formspreeLink}')" class="final-code-box" id="leadFormGroup">
+                        <div class="code-wrap-area">
+                            <label>Mã ${currentBrand} tương đương:</label>
+                            <div class="code-highlight">${finalOurCode}</div>
+                            <a href="${matchRule.catalog}" target="_blank" class="catalog-link-btn">
+                                📥 Tải Catalog ${currentBrand} của mã này
+                            </a>
+                        </div>
+                        <input type="hidden" name="Ma_Goc" value="${inputVal}">
+                        <input type="hidden" name="Ma_Quy_Doi" value="${finalOurCode}">
+                        <input type="hidden" name="Thuong_Hieu" value="${currentBrand}">
+                        <div class="lead-capture-form">
+                            <div class="lead-input-wrap">
+                                <label>Nhận báo giá nhà máy ngay:</label>
+                                <input type="text" name="Lien_He" id="customerContact" class="input-lead" placeholder="SĐT hoặc Email của bạn..." required />
+                            </div>
+                            <button type="submit" id="btnSubmitLead" class="btn-submit-lead">Gửi mã</button>
+                        </div>
+                    </form>
+                `;
+           } else {
+                const formspreeLink = "https://formspree.io/f/xoqvvbnd"; // Giữ nguyên link Formspree của bạn
+
+                content.className = "result-box status-error";
+                content.innerHTML = `
+                    <div class="result-title text-error">❌ Chưa tìm thấy mã tương đương</div>
+                    <div style="color: #cbd5e1; line-height: 1.5; font-size: 13px; margin-bottom: 15px;">
+                        Mã model <strong style="color: #f87171;">"${inputVal}"</strong> chưa có sẵn trong data quy đổi tự động
+                    </div>
+
+                    <form onsubmit="submitQuoteForm(event, '${formspreeLink}')" class="final-code-box" id="leadFormGroupManual" style="border-color: rgba(239, 68, 68, 0.2); background: linear-gradient(to right, rgba(239, 68, 68, 0.02), rgba(99, 102, 241, 0.02));">
+                        <div class="code-wrap-area">
+                            <label>Mã bạn vừa tra cứu:</label>
+                            <div class="code-highlight" style="background: linear-gradient(to right, #ef4444, #ea580c); font-size: 18px;">${inputVal}</div>
+                            <span style="font-size: 11px; color: #94a3b8; font-style: italic; margin-top: 4px;">
+                                * Kỹ thuật viên sẽ kiểm tra kích thước,thông số kĩ thuât dựa trên mã này để quy đổi thủ công.
+                            </span>
+                        </div>
+                        
+                        <!-- Các input hidden để truyền dữ liệu lên Formspree -->
+                        <input type="hidden" name="Ma_SMC_Goc" value="${inputVal}">
+                        <input type="hidden" name="Ma_Airich_Doi" value="Yêu cầu kiểm tra thủ công (Mã chưa có sẵn)">
+                        
+                        <div class="lead-capture-form">
+                            <div class="lead-input-wrap">
+                                <label>Để lại SĐT / Email nhận báo giá thủ công:</label>
+                                <input type="text" name="Lien_He" id="customerContactManual" class="input-lead" placeholder="Nhập số điện thoại hoặc email..." required />
+                            </div>
+                            <button type="submit" id="btnSubmitLeadManual" class="btn-submit-lead" style="background: linear-gradient(to right, #ef4444, #dc2626);">Gửi Yêu Cầu</button>
+                        </div>
+                    </form>
+                `;
+            }
+            showContainerSmoothly(container);
+        }
+
+        function submitQuoteForm(event, actionUrl) {
+            event.preventDefault(); const form = event.target; const button = document.getElementById("btnSubmitLead"); const formGroup = document.getElementById("leadFormGroup");
+            button.disabled = true; button.innerText = "...";
+            fetch(actionUrl, { method: "POST", body: new FormData(form), headers: { 'Accept': 'application/json' } }).then(response => {
+                if (response.ok) { formGroup.innerHTML = `<div style="color: #34d399; font-weight: bold; text-align:center; width:100%; padding: 10px 0;">🎉 Gửi thành công! Đội ngũ kinh doanh sẽ phản hồi báo giá cạnh tranh ngay lập tức.</div>`; }
+            });
+        }
+        
+        function showContainerSmoothly(element) { element.style.display = "block"; setTimeout(() => { element.classList.add("show"); }, 20); }
+    </script>
+</body>
+</html>

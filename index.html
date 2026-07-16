@@ -511,6 +511,7 @@
                 </div>
             </div>
 
+            <!-- Đã khôi phục onsubmit cho form -->
             <form id="ballscrewForm" action="https://forminit.com/f/71omupo9nr7" method="POST" enctype="multipart/form-data" class="ballscrew-special-section" onsubmit="submitBallscrewForm(event)">
                 <div class="ballscrew-title">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
@@ -521,7 +522,8 @@
                 <div class="ballscrew-form-grid">
                     <div class="form-group">
                         <label>1. SĐT / Email liên hệ:</label>
-                        <input type="text" name="Thong_Tin_Lien_He" placeholder="Nhập số điện thoại hoặc email của bạn..." required>
+                        <!-- Cập nhật name sang chuẩn Forminit -->
+                        <input type="text" name="fi-text-Thong_Tin_Lien_He" placeholder="Nhập số điện thoại hoặc email của bạn..." required>
                     </div>
                     <div class="form-group">
                         <label>2. Đính kèm Bản vẽ kỹ thuật:</label>
@@ -539,7 +541,8 @@
                         <button type="submit" id="btnSubmitBallscrew" class="btn-submit-ballscrew">Gửi Bản Vẽ</button>
                     </div>
                 </div>
-                <input type="hidden" name="Loai_Yeu_Cau" value="Gia_Cong_Truc_Vit_Me_Theo_Ban_Ve">
+                <!-- Cập nhật name sang chuẩn Forminit -->
+                <input type="hidden" name="fi-text-Loai_Yeu_Cau" value="Gia_Cong_Truc_Vit_Me_Theo_Ban_Ve">
             </form>
 
             <div class="search-flex-group">
@@ -647,21 +650,11 @@
             });
         }
 
-        function removeFile(indexToRemove) {
-            selectedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
-            updateFileList();
-        }
-
         function submitBallscrewForm(event) {
             event.preventDefault();
             const form = event.target;
             const button = document.getElementById("btnSubmitBallscrew");
             
-            if(form.action.includes("71omupo9nr7")) {
-                alert("Bạn vui lòng cấu hình mã Form ID từ forminit.com trước khi dùng.");
-                return;
-            }
-
             if(selectedFiles.length === 0) {
                 alert("Vui lòng đính kèm ít nhất 1 bản vẽ kỹ thuật trước khi gửi.");
                 return;
@@ -671,11 +664,13 @@
             button.innerText = "Đang gửi file...";
 
             const formData = new FormData();
-            formData.append("Thong_Tin_Lien_He", form.elements["Thong_Tin_Lien_He"].value);
-            formData.append("Loai_Yeu_Cau", form.elements["Loai_Yeu_Cau"].value);
+            // Đã đổi key nhận dữ liệu sang định dạng yêu cầu của Forminit
+            formData.append("fi-text-Thong_Tin_Lien_He", form.elements["fi-text-Thong_Tin_Lien_He"].value);
+            formData.append("fi-text-Loai_Yeu_Cau", form.elements["fi-text-Loai_Yeu_Cau"].value);
             
+            // Đã đổi key mảng file theo chuẩn Forminit
             selectedFiles.forEach(file => {
-                formData.append("File_Ban_Ve", file);
+                formData.append("fi-file-Ban_Ve[]", file);
             });
 
             fetch(form.action, {
@@ -741,7 +736,7 @@
             if (matchRule) {
                 const suffix = inputVal.substring(matchedPrefix.length);
                 const finalOurCode = matchRule.ourPrefix + suffix;
-                const formspreeLink = "https://formspree.io/f/xgogeaya"; 
+                const formspreeLink = "https://formspree.io/f/xoqvvbnd"; 
                 
                 // Lấy tên thương hiệu động từ Database (Aplus hoặc Airich)
                 const currentBrand = matchRule.brand ? matchRule.brand : "Airich";
@@ -781,7 +776,7 @@
                     </form>
                 `;
            } else {
-                const formspreeLink = "https://formspree.io/f/xgogeaya"; // Giữ nguyên link Formspree của bạn
+                const formspreeLink = "https://formspree.io/f/xoqvvbnd"; // Giữ nguyên link Formspree của bạn
 
                 content.className = "result-box status-error";
                 content.innerHTML = `
@@ -817,38 +812,12 @@
         }
 
         function submitQuoteForm(event, actionUrl) {
-    event.preventDefault(); 
-    
-    // Sử dụng event.target để lấy chính xác form vừa được nhấn gửi
-    const form = event.target; 
-    const button = form.querySelector('button[type="submit"]');
-    
-    // Cập nhật trạng thái nút bấm để người dùng biết hệ thống đang xử lý
-    button.disabled = true; 
-    button.innerText = "Đang gửi...";
-
-    fetch(actionUrl, { 
-        method: "POST", 
-        body: new FormData(form), 
-        headers: { 'Accept': 'application/json' } 
-    }).then(response => {
-        if (response.ok) {
-            // Thay thế nội dung của chính form đó bằng thông báo thành công
-            form.innerHTML = `
-                <div style="color: #34d399; font-weight: bold; text-align:center; width:100%; padding: 20px 0; background: #0f172a; border-radius: 12px; border: 1px solid #10b981;">
-                    🎉 Gửi thành công! Đội ngũ kinh doanh sẽ phản hồi báo giá cạnh tranh ngay lập tức.
-                </div>`;
-        } else {
-            alert("Có lỗi xảy ra, vui lòng thử lại!");
-            button.disabled = false;
-            button.innerText = "Gửi yêu cầu";
+            event.preventDefault(); const form = event.target; const button = document.getElementById("btnSubmitLead"); const formGroup = document.getElementById("leadFormGroup");
+            button.disabled = true; button.innerText = "...";
+            fetch(actionUrl, { method: "POST", body: new FormData(form), headers: { 'Accept': 'application/json' } }).then(response => {
+                if (response.ok) { formGroup.innerHTML = `<div style="color: #34d399; font-weight: bold; text-align:center; width:100%; padding: 10px 0;">🎉 Gửi thành công! Đội ngũ kinh doanh sẽ phản hồi báo giá cạnh tranh ngay lập tức.</div>`; }
+            });
         }
-    }).catch(error => {
-        alert("Lỗi kết nối mạng.");
-        button.disabled = false;
-        button.innerText = "Gửi yêu cầu";
-    });
-}
         
         function showContainerSmoothly(element) { element.style.display = "block"; setTimeout(() => { element.classList.add("show"); }, 20); }
     </script>
